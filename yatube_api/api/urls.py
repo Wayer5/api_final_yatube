@@ -8,12 +8,14 @@ from .views import (
 )
 
 router = DefaultRouter()
-router.register(r'v1/posts', PostViewSet, basename='posts')
-router.register(r'v1/groups', GroupViewSet, basename='groups')
-router.register(r'v1/follow', FollowViewSet, basename='follow')
-router.register(r'v1/posts/(?P<post_id>\d+)/comments',
+router.register('posts', PostViewSet, basename='posts')
+router.register('groups', GroupViewSet, basename='groups')
+router.register('follow', FollowViewSet, basename='follow')
+router.register(r'posts/(?P<post_id>\d+)/comments',
                 CommentViewSet, basename='comments')
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('v1/', include(router.urls)),
+    path('v1/', include('djoser.urls')),
+    path('v1/', include('djoser.urls.jwt')),
 ]

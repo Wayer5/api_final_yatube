@@ -1,12 +1,13 @@
 from rest_framework import viewsets, permissions, mixins
+from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.generics import get_object_or_404
+from rest_framework.filters import SearchFilter
+
 from posts.models import Post, Comment, Group
 from .serializers import (
     PostSerializer, CommentSerializer, GroupSerializer, FollowSerializer
 )
 from .permissions import IsAuthorOrReadOnly
-from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.generics import get_object_or_404
-from rest_framework.filters import SearchFilter
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -61,8 +62,8 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user, post=self.get_post())
 
     def get_queryset(self):
-        return Comment.objects.select_related('author').filter(
-            post__id=self.kwargs.get('post_id'))
+        post = self.get_post()
+        return Comment.objects.filter(post=post).select_related('author')
 
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
