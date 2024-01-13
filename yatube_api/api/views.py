@@ -19,41 +19,11 @@ class PostViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-    def perform_update(self, serializer):
-        post = self.get_object()
-        if post.author != self.request.user:
-            raise permissions.PermissionDenied(
-                "У вас нет прав для редактирования этого поста."
-            )
-        serializer.save()
-
-    def perform_destroy(self, instance):
-        if instance.author != self.request.user:
-            raise permissions.PermissionDenied(
-                "У вас нет прав для удаления этого поста."
-            )
-        instance.delete()
-
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = (IsAuthorOrReadOnly,)
-
-    def perform_update(self, serializer):
-        comment = self.get_object()
-        if comment.author != self.request.user:
-            raise permissions.PermissionDenied(
-                "У вас нет прав для редактирования этого комментария."
-            )
-        serializer.save()
-
-    def perform_destroy(self, instance):
-        if instance.author != self.request.user:
-            raise permissions.PermissionDenied(
-                "У вас нет прав для удаления этого комментария."
-            )
-        instance.delete()
 
     def get_post(self):
         return get_object_or_404(Post, pk=self.kwargs.get('post_id'))
